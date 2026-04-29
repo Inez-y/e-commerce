@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -15,11 +15,11 @@ async function main() {
         create: {
             email: 'admin@test.com',
             passwordHash: adminPasswordHash,
-            role: Role.ADMIN,
+            role: 'ADMIN',
         },
     });
 
-    const user = await prisma.user.upsert({
+    const customer = await prisma.user.upsert({
         where: {
             email: 'customer@test.com',
         },
@@ -27,7 +27,7 @@ async function main() {
         create: {
             email: 'customer@test.com',
             passwordHash: customerPasswordHash,
-            role: Role.CUSTOMER,
+            role: 'CUSTOMER',
         },
     });
 
@@ -43,7 +43,7 @@ async function main() {
         name: 'Wireless Mouse',
         description: 'Ergonomic wireless mouse with adjustable DPI.',
         sku: 'MOUSE-001',
-        priceCents: 3999,
+        priceCents: 3999, 
         quantity: 40,
         },
         {
@@ -56,6 +56,54 @@ async function main() {
     ];
 
     for (const product of products) {
-        const 
+        const createdProduct = await prisma.product.upsert({
+            where: {
+                sku: product.sku,
+            },
+            update: {
+                name: product.name,
+                description: product.description,
+                priceCents: product.priceCents,
+                isActive: true,
+            },
+            create: {
+                name: product.name,
+                description: product.description,
+                priceCents: product.priceCents,
+                isActive: true,
+                sku: product.sku,
+            },
+        });
+
+        await prisma.inventory.upsert({
+            where: {
+                productId: createdProduct.id,
+            },
+            update: {
+                quantity: product.quantity,
+                reserved: 0,
+            },
+            create: {
+                productId: createdProduct.id,
+                quantity: product.quantity,
+                reserved: 0,
+            },
+        });
     }
+
+    console.log('[Database] Prisma seed completed.');
+    console.log({
+        admin: admin.email,
+        customer: customer.email,
+        productCount: products.length,
+    });
 }
+
+// Call main
+main()
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    }).finally(async ()=> {
+        await prisma.$disconnect();
+    });

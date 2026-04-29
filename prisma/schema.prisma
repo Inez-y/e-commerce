@@ -3,13 +3,141 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  FULFILLED
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum NotificationType {
+  ORDER_CREATED
+  ORDER_CANCELLED
+  LOW_STOCK
+}
+
+enum AuditAction {
+  USER_REGISTERED
+  PRODUCT_CREATED
+  PRODUCT_UPDATED
+  ORDER_CREATED
+  ORDER_CANCELLED
+  INVENTORY_UPDATED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(CUSTOMER)
+
+  orders       Order[]
+  auditLogs    AuditLog[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  priceCents  Int
+  sku         String   @unique
+  isActive    Boolean  @default(true)
+
+  inventory   Inventory?
+  orderItems  OrderItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Inventory {
+  id        String  @id @default(uuid())
+  productId String  @unique
+  quantity  Int
+  reserved  Int     @default(0)
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  userId      String
+  status      OrderStatus @default(PENDING)
+  totalCents  Int
+
+  user        User        @relation(fields: [userId], references: [id])
+  items       OrderItem[]
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id               String  @id @default(uuid())
+  orderId          String
+  productId        String
+
+  quantity         Int
+  unitPriceCents   Int
+  subtotalCents    Int
+
+  order            Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product          Product @relation(fields: [productId], references: [id])
+
+  createdAt        DateTime @default(now())
+}
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String?
+  action      AuditAction
+  entityType  String
+  entityId    String?
+  metadata    Json?
+
+  user        User?       @relation(fields: [userId], references: [id])
+
+  createdAt   DateTime    @default(now())
+}
+
+model Notification {
+  id             String             @id @default(uuid())
+  type           NotificationType
+  status         NotificationStatus @default(PENDING)
+
+  recipientEmail String
+  subject        String
+  body           String
+
+  errorMessage   String?
+  sentAt         DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
