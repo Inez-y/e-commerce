@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../prisma';
 import { auth } from '../middleware/auth';
+import { createNotification } from '../notifications/notification.service';
 
 export const orderRoutes = Router();
 
@@ -19,6 +20,7 @@ orderRoutes.post('/', auth, async(req, res)=> {
 
         const userId = req.user!.sub;
         
+        console.log('[Orders] Creating order...');
         const result = await prisma.$transaction(async(tx) => {
             let totalCents = 0;
             const createdItems = [];
@@ -119,6 +121,19 @@ orderRoutes.post('/', auth, async(req, res)=> {
 
             return updateOrder;
         });
+
+        console.log('[Orders] Order created:', result.id);
+        console.log('[Orders] Creating notification...');
+
+        // Working with notification worker
+        await createNotification({
+            type: 'ORDER_CREATED',
+            recipientEmail: req.user!.email,
+            subject: 'Your order was created',
+            body: `Your order ${result.id} was created successfully. 
+                    Total: $${( result.totalCents / 100 ).toFixed(2)}`
+        });
+        console.log('[Orders] Notification queued.');
 
         return res.status(201).json(result);
     }
