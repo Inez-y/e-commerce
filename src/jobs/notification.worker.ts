@@ -6,9 +6,49 @@ import type { NotificationJobData } from './notification.queue';
 
 dotenv.config();
 
-const worker = new Worker<NotificatinoJObData>(
+const worker = new Worker<NotificationJobData>(
     'notifications',
-    async (job) => {}
+    async (job) => {
+        const { notificationId } = job.data;
+
+        const notification = await prisma.notification.findUnique({
+            where: {
+                id: notificationId,
+            },
+        });
+
+        if (!notification) {
+            throw new Error(`[Notification worker] Notification not found: ${notificationId}`);
+        }
+
+        if (notification.status === 'SENT') {
+            return { skipped: true, reason: 'Notification already sent.', };
+        }
+
+        console.log('[Notification worker] Sending notification now...');
+        console.log({
+            to: notification.recipientEmail,
+            subject: notification.subject,
+            body: notification.body,
+        });
+
+        // TODO: replace update for real email providers
+        await prisma.notification.update({
+            where: {
+                id: notificationId,
+            },
+            data: {
+                status: 'SENT',
+                sentAt: new Date(),
+                errorMessage: null,
+            },
+        });
+
+        return { sent: true, notificationId: notification.id, };
+    },
+    {
+        connection: redisConnection,
+    }
 );
 
 worker.on('completed', (job) => {
@@ -32,4 +72,4 @@ worker.on('failed', async (job, error) => {
     }
 });
 
-console.log('[Notification worker] Running smoothly.')
+console.log('[Notification worker] Running smoothly.');

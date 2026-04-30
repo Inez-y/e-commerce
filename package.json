@@ -1,9 +1,9 @@
 {
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js",
+    "worker:notifications": "tsx watch src/jobs/notification.worker.ts",
     "build": "tsc",
-    "test": "echo \"No tests yet\""
+    "start": "node dist/server.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
