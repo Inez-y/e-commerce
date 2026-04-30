@@ -13,6 +13,7 @@ export const notificationQueue = new Queue<NotificationJobData>(
 );
 
 export async function enqueueNotificationJob(notificationId: string) {
+    console.log('[Notification queue] Adding job for notification:', notificationId);
     await notificationQueue.add(
         'send-notification',
         {
@@ -29,4 +30,6 @@ export async function enqueueNotificationJob(notificationId: string) {
             removeOnFail: false,
         }
     );
+
+    console.log('[Notification queue] Job added.');
 };
