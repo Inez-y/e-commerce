@@ -12,7 +12,7 @@ export const notificationQueue = new Queue<NotificationJobData>(
     }
 );
 
-export async function enqueueNotification(notificationId: string) {
+export async function enqueueNotificationJob(notificationId: string) {
     await notificationQueue.add(
         'send-notification',
         {
