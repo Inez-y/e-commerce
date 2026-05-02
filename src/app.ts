@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import { authRoutes } from './auth/auth.routes';
 import { productRoutes } from './products/product.routes';
@@ -17,6 +18,8 @@ app.get('/', (req, res) => {
         },
     });
 });
+
+app.use(express.json());
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });

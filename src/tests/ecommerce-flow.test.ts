@@ -1,20 +1,32 @@
+import 'dotenv/config';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { app } from '../app';
-import env from 'dotenv';
 
 describe('E-commerce API flow', () => {
     it('Allows admin to create a product and custoemr to create an order.', async() => {
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        const customerEmail = process.env.CUSTOMER_EMAIL;
+        const customerPassword = process.env.CUSTOMER_PASSWORD;
+
+        expect(adminEmail).toBeTruthy();
+        expect(adminPassword).toBeTruthy();
+        expect(customerEmail).toBeTruthy();
+        expect(customerPassword).toBeTruthy();
+
         // Admin
         const adminLogin = await request(app)
             .post('/auth/login')
             .send({
-                email: process.env.ADMIN_EMAIL,
-                password: process.env.ADMIN_PASSWORD,
+                email: adminEmail,
+                password: adminPassword,
             })
             .expect(200);
 
         const adminToken = adminLogin.body.accessToken;
+        console.log('ADMIN LOGIN STATUS:', adminLogin.status);
+        console.log('ADMIN LOGIN BODY:', adminLogin.body);
         expect(adminToken).toBeTruthy();
 
         const uniqueSKU = `TEST-${Date.now()}`;
@@ -40,13 +52,15 @@ describe('E-commerce API flow', () => {
         const customerLogin = await request(app)
             .post('/auth/login')
             .send({
-                email: process.env.CUSTOMER_LOGIN,
-                password: process.env.CUSTOMER_PASSWORD,
+                email: customerEmail,
+                password: customerPassword,
             })
             .expect(200);
 
         const customerToken = customerLogin.body.accessToken;
-        expect(customerToken).toBeTruthy;
+        console.log('CUSTOMER LOGIN STATUS:', customerLogin.status);
+        console.log('CUSTOMER LOGIN BODY:', customerLogin.body);
+        expect(customerToken).toBeTruthy();
 
         const createOrder = await request(app)
             .post('/orders')
@@ -62,7 +76,7 @@ describe('E-commerce API flow', () => {
             .expect(201);
 
         const order = createOrder.body;
-        expect(order.id).toBeTruthy;
+        expect(order.id).toBeTruthy();
         expect(order.totalCents).toBe(5000);
         expect(order.items).toHaveLength(1);
         expect(order.items[0].quantity).toBe(2);

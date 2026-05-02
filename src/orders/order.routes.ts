@@ -63,7 +63,7 @@ orderRoutes.post('/', auth, async(req, res)=> {
                     throw new Error(`Not enough inventory for product: ${product.name}`);
                 }
 
-                const subtotalCents = product.priceCents = quantity;
+                const subtotalCents = product.priceCents * quantity;
                 totalCents += subtotalCents;
 
                 const orderItem = await tx.orderItem.create({
