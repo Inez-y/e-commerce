@@ -45,5 +45,32 @@ describe('E-commerce API flow', () => {
             })
             .expect(200);
 
-    })
+        const customerToken = customerLogin.body.accessToken;
+        expect(customerToken).toBeTruthy;
+
+        const createOrder = await request(app)
+            .post('/orders')
+            .set('Authorization', `Bearer ${customerToken}`)
+            .send({
+                items: [
+                    {
+                        productId: product.id,
+                        quantity: 2,
+                    }
+                ]
+            })
+            .expect(201);
+
+        const order = createOrder.body;
+        expect(order.id).toBeTruthy;
+        expect(order.totalCents).toBe(5000);
+        expect(order.items).toHaveLength(1);
+        expect(order.items[0].quantity).toBe(2);
+
+        const getProduct = await request(app)
+            .get(`/products/${product.id}`)
+            .expect(200);
+
+        expect(getProduct.body.inventory.quantity).toBe(8);
+    });
 });
