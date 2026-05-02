@@ -2,6 +2,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "worker:notifications": "tsx watch src/jobs/notification.worker.ts",
+    "test": "vitest",
     "build": "tsc",
     "start": "node dist/server.js"
   },
