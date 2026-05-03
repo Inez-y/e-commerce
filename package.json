@@ -2,7 +2,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "worker:notifications": "tsx watch src/jobs/notification.worker.ts",
-    "test": "vitest",
+    "test": "NODE_ENV=test npx vitest run",
     "build": "tsc",
     "start": "node dist/server.js"
   },

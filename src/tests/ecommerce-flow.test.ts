@@ -1,7 +1,13 @@
 import 'dotenv/config';
 import request from 'supertest';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { app } from '../app';
+import { prisma } from '../prisma';
+
+// Prevent timeout error due to open handles 
+afterAll(async () => {
+  await prisma.$disconnect();
+});
 
 describe('E-commerce API flow', () => {
     it('Allows admin to create a product and custoemr to create an order.', async() => {
@@ -70,21 +76,47 @@ describe('E-commerce API flow', () => {
                     {
                         productId: product.id,
                         quantity: 2,
-                    }
-                ]
+                    },
+                ],
             })
             .expect(201);
 
+        console.log('[Test] Create order response received.');
+
         const order = createOrder.body;
+        console.log('[Test] Checking order assertions...');
+
         expect(order.id).toBeTruthy();
         expect(order.totalCents).toBe(5000);
         expect(order.items).toHaveLength(1);
         expect(order.items[0].quantity).toBe(2);
+        expect(order.items[0].unitPriceCents).toBe(2500);
+        expect(order.items[0].subtotalCents).toBe(5000);
 
+        console.log('[Test] Fetching product after order...');
         const getProduct = await request(app)
             .get(`/products/${product.id}`)
             .expect(200);
+        console.log('[Test] Product fetched after order.');
 
         expect(getProduct.body.inventory.quantity).toBe(8);
-    });
+
+        console.log('[Test] Checking notification row...');
+        // Notification
+        const notifications = await prisma.notification.findMany({
+        where: {
+            recipientEmail: customerEmail,
+            type: 'ORDER_CREATED',
+            },
+        orderBy: {
+            createdAt: 'desc',
+            },
+        });
+
+        console.log('[Test] Notification rows found:', notifications.length);
+        expect(notifications.length).toBeGreaterThan(0);
+        expect(notifications[0].status).toBe('PENDING');
+
+        console.log('[Test] Finished all assertions for flow test.');
+    }, 10000);
 });

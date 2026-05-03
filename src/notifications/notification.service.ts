@@ -24,6 +24,13 @@ export async function createNotification(input: CreateNotificationInput) {
   console.log('[Notification service] Notification created:', notification.id);
   console.log('[Notification service] Enqueueing notification job...');
 
+  if (process.env.NODE_ENV === 'test') {
+    console.log('[Notification service] Skipping queue in test environment.');
+    return notification;
+  }
+
+  console.log('[Notification service] Enqueueing notification job...');
+  
   await enqueueNotificationJob(notification.id);
 
   console.log('[Notification service] Notification job enqueued.');

@@ -131,8 +131,9 @@ orderRoutes.post('/', auth, async(req, res)=> {
             recipientEmail: req.user!.email,
             subject: 'Your order was created',
             body: `Your order ${result.id} was created successfully. 
-                    Total: $${( result.totalCents / 100 ).toFixed(2)}`
+                    Total: $${( result.totalCents / 100 ).toFixed(2)}`,
         });
+        
         console.log('[Orders] Notification queued.');
 
         return res.status(201).json(result);
