@@ -4,8 +4,12 @@ import { authRoutes } from './auth/auth.routes';
 import { productRoutes } from './products/product.routes';
 import { orderRoutes } from './orders/order.routes';
 import { notificationRoutes } from './notifications/notification.routes';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './docs/swagger';
 
 export const app = express();
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {
     res.json({

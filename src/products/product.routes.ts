@@ -6,6 +6,18 @@ import { requireRole } from '../middleware/requireRole';
 export const productRoutes = Router();
 
 /**
+ * @openapi
+ * /products:
+ *   get:
+ *     summary: List active products
+ *     tags:
+ *       - Products
+ *     responses:
+ *       200:
+ *         description: List of active products
+ */
+
+/**
  * GET /products
  * Public storefront product list
  */
@@ -74,6 +86,54 @@ productRoutes.get('/:id', async(req, res) => {
         });
     }
 });
+
+/**
+ * @openapi
+ * /products:
+ *   post:
+ *     summary: Create a product
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - sku
+ *               - priceCents
+ *               - quantity
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Laptop Stand
+ *               description:
+ *                 type: string
+ *                 example: Adjustable aluminum laptop stand
+ *               sku:
+ *                 type: string
+ *                 example: STAND-001
+ *               priceCents:
+ *                 type: integer
+ *                 example: 5999
+ *               quantity:
+ *                 type: integer
+ *                 example: 20
+ *     responses:
+ *       201:
+ *         description: Product created
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ *       409:
+ *         description: SKU already exists
+ */
+
 /**
  * POST /products
  * Admin creates product, in

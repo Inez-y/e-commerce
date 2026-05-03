@@ -5,6 +5,37 @@ import { prisma } from '../prisma';
 
 export const authRoutes = Router();
 
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     summary: Login and receive a JWT token
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: admin@test.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       400:
+ *         description: Missing email or password
+ *       401:
+ *         description: Invalid credentials
+ */
 authRoutes.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body ?? {};
