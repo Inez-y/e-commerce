@@ -1,8 +1,10 @@
 {
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "dev:docker": "tsx src/server.ts",
     "worker:notifications": "tsx watch src/jobs/notification.worker.ts",
-    "test": "NODE_ENV=test npx vitest run",
+    "worker:notifications:docker": "tsx src/jobs/notification.worker.ts",
+    "test": "NODE_ENV=test vitest run",
     "build": "tsc",
     "start": "node dist/server.js"
   },
@@ -11,20 +13,35 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/supertest": "^7.2.0",
     "bullmq": "^5.76.4",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "ioredis": "^5.10.1",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^6.19.3",
+    "supertest": "^7.2.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.4"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/supertest": "^7.2.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "dotenv": "^17.4.2",
     "prisma": "^6.19.3",
     "supertest": "^7.2.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }

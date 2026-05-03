@@ -19,5 +19,40 @@ services:
     ports:
       - "6379:6379"
 
+  api:
+    build: .
+    container_name: ecommerce-api
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ecommerce?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: SUPER-SECRET-DEV-KEY
+      ADMIN_EMAIL: admin@test.com
+      ADMIN_PASSWORD: password123
+      CUSTOMER_EMAIL: customer@test.com
+      CUSTOMER_PASSWORD: password123
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    command: sh -c "npx prisma generate && npm run dev:docker"
+
+  worker:
+    build: .
+    container_name: ecommerce-notification-worker
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ecommerce?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: SUPER-SECRET-DEV-KEY
+    command: sh -c "npx prisma generate && npm run worker:notifications:docker"
+
 volumes:
   ecommerce_postgres_data:
