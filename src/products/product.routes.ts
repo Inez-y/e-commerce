@@ -38,10 +38,20 @@ productRoutes.get('/', async(req, res) => {
  * Public product detail
  */
 productRoutes.get('/:id', async(req, res) => {
+    console.log('[Products] GET product by id hit:', req.params.id);
+    
     try {
+        const productId = req.params.id;
+
+        if (typeof productId !== 'string') {
+            return res.status(400).json({
+                message: 'Invalid product id',
+            });
+        }
+
         const product = await prisma.product.findFirst({
             where: {
-                id: req.params.id,
+                id: productId,
                 isActive: true,
             },
             include: {
@@ -51,14 +61,16 @@ productRoutes.get('/:id', async(req, res) => {
 
         if (!product) {
             return res.status(404).json({
-                message: ' Product not found.'
+                message: 'Product not found.'
             });
         }
+
+        return res.json(product);
     }
     catch (error) {
         console.error(error);
         return res.status(500).json({
-            message: ' Failed to fetch product.'
+            message: 'Failed to fetch product.'
         });
     }
 });

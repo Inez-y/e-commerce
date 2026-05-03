@@ -63,7 +63,7 @@ orderRoutes.post('/', auth, async(req, res)=> {
                     throw new Error(`Not enough inventory for product: ${product.name}`);
                 }
 
-                const subtotalCents = product.priceCents = quantity;
+                const subtotalCents = product.priceCents * quantity;
                 totalCents += subtotalCents;
 
                 const orderItem = await tx.orderItem.create({
@@ -131,8 +131,9 @@ orderRoutes.post('/', auth, async(req, res)=> {
             recipientEmail: req.user!.email,
             subject: 'Your order was created',
             body: `Your order ${result.id} was created successfully. 
-                    Total: $${( result.totalCents / 100 ).toFixed(2)}`
+                    Total: $${( result.totalCents / 100 ).toFixed(2)}`,
         });
+        
         console.log('[Orders] Notification queued.');
 
         return res.status(201).json(result);

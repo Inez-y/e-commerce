@@ -2,6 +2,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "worker:notifications": "tsx watch src/jobs/notification.worker.ts",
+    "test": "NODE_ENV=test npx vitest run",
     "build": "tsc",
     "start": "node dist/server.js"
   },
@@ -18,9 +19,12 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/supertest": "^7.2.0",
     "dotenv": "^17.4.2",
     "prisma": "^6.19.3",
+    "supertest": "^7.2.2",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.4"
   }
 }
