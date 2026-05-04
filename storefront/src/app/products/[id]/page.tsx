@@ -53,9 +53,15 @@ export default async function ProductDetailPage({
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-3xl">
-        <Link href="/" className="text-sm text-gray-600 hover:underline">
-          ← Back to products
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link href="/" className="text-sm text-gray-600 hover:underline">
+            ← Back to products
+          </Link>
+
+          <Link href="/cart" className="text-sm text-gray-600 hover:underline">
+            View cart
+          </Link>
+        </div>
 
         <section className="mt-8 rounded-2xl border p-8 shadow-sm">
           <div className="flex items-start justify-between gap-6">
