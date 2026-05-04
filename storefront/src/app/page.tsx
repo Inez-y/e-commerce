@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 type Product = {
   id: string;
   name: string;
@@ -70,11 +72,12 @@ export default async function HomePage() {
 
                 <p className="mt-1 text-sm text-gray-500"> Stock: {product.inventory?.quantity ?? 0} </p>
 
-                <a
+                <Link
                   href={`/products/${product.id}`}
-                  className="mt-4 inline-block rounded-lg bg-black px-4 py-2 text-sm text-white">
+                  className="mt-4 inline-block rounded-lg bg-black px-4 py-2 text-sm text-white"
+                >
                   View product
-                </a>
+                </Link>
             </div>
           ))};
         </div>

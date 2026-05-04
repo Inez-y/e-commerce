@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { prisma } from '../prisma';
-import { auth } from '../middleware/auth';
-import { requireRole } from '../middleware/requireRole';
+import { prisma } from '../../../../src/prisma';
+import { auth } from '../../../../src/middleware/auth';
+import { requireRole } from '../../../../src/middleware/requireRole';
 
 export const productRoutes = Router();
 
