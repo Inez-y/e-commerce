@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AddToCartButton } from '@/components/add-to-cart-button';
 
 type Product = {
   id: string;
@@ -77,12 +78,14 @@ export default async function ProductDetailPage({
             <p className="text-xl font-semibold">{stock}</p>
           </div>
 
-          <button
+          <AddToCartButton
+            product={{
+              id: product.id,
+              name: product.name,
+              priceCents: product.priceCents,
+            }}
             disabled={isOutOfStock}
-            className="mt-8 w-full rounded-xl bg-black px-5 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
-          >
-            {isOutOfStock ? 'Out of stock' : 'Add to cart'}
-          </button>
+          />
         </section>
       </div>
     </main>
