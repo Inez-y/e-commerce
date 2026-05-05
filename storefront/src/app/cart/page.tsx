@@ -2,9 +2,44 @@
 
 import Link from 'next/link';
 import { useCart } from '@/context/cart-context';
+import { useRouter } from 'next/navigation';
 
 function formatPrice(priceCents: number) {
   return `$${(priceCents / 100).toFixed(2)}`;
+}
+
+async function handleCheckout() {
+  const token = localStorage.getItem('accessToken');
+  const router = useRouter();
+  
+  if (!token) {
+    router.push('/login');
+    return;
+  }
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      items: items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      })),
+    }),
+  });
+
+  const data = await res.json();
+    if (!res.ok) {
+    alert(data.message ?? 'Checkout failed');
+    return;
+  }
+
+  clearCart();
+  
+  router.push(`/orders/${data.id}`);
 }
 
 export default function CartPage() {
@@ -13,9 +48,12 @@ export default function CartPage() {
     increaseQuantity,
     decreaseQuantity,
     removeItem,
+    clearCart,
     totalCents,
     itemCount,
   } = useCart();
+
+  const router = useRouter();
 
   return (
     <main className="min-h-screen p-8">
@@ -86,7 +124,10 @@ export default function CartPage() {
                 <span>{formatPrice(totalCents)}</span>
               </div>
 
-              <button className="mt-6 w-full rounded-xl bg-black px-5 py-3 font-medium text-white">
+              <button
+                onClick={handleCheckout}
+                className="mt-6 w-full rounded-xl bg-black px-5 py-3 font-medium text-white"
+              >
                 Checkout
               </button>
             </div>
