@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { authRoutes } from './auth/auth.routes';
 import { productRoutes } from './products/product.routes';
 import { orderRoutes } from './orders/order.routes';
@@ -24,6 +25,13 @@ app.get('/', (req, res) => {
 });
 
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: ['http://localhost:3001', 'http://localhost:3000'],
+    credentials: true,
+  })
+);
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });

@@ -8,40 +8,6 @@ function formatPrice(priceCents: number) {
   return `$${(priceCents / 100).toFixed(2)}`;
 }
 
-async function handleCheckout() {
-  const token = localStorage.getItem('accessToken');
-  const router = useRouter();
-  
-  if (!token) {
-    router.push('/login');
-    return;
-  }
-
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      items: items.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-      })),
-    }),
-  });
-
-  const data = await res.json();
-    if (!res.ok) {
-    alert(data.message ?? 'Checkout failed');
-    return;
-  }
-
-  clearCart();
-  
-  router.push(`/orders/${data.id}`);
-}
-
 export default function CartPage() {
   const {
     items,
@@ -54,6 +20,40 @@ export default function CartPage() {
   } = useCart();
 
   const router = useRouter();
+  async function handleCheckout() {
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+      console.log('[Cart] Login needed.');
+      router.push('/login');
+      return;
+    }
+
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        items: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      }),
+    });
+
+    const data = await res.json();
+      if (!res.ok) {
+      alert(data.message ?? 'Checkout failed');
+      return;
+    }
+
+    clearCart();
+    
+    router.push(`/orders/${data.id}`);
+  }
 
   return (
     <main className="min-h-screen p-8">
