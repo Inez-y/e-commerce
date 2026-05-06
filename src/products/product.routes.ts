@@ -112,3 +112,146 @@ productRoutes.post('/', auth, requireRole('ADMIN'), async (req, res) => {
     });
   }
 });
+
+productRoutes.patch('/:id', auth, requireRole('ADMIN'), async (req, res) => {
+  try {
+    const productId = req.params.id;
+
+    if (typeof productId !== 'string') {
+      return res.status(400).json({
+        message: 'Invalid product id',
+      });
+    }
+
+    const { name, description, priceCents, quantity, isActive } = req.body;
+
+    const existingProduct = await prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+      include: {
+        inventory: true,
+      },
+    });
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        message: 'Product not found',
+      });
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedProduct = await tx.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          ...(name !== undefined && { name }),
+          ...(description !== undefined && { description }),
+          ...(priceCents !== undefined && { priceCents }),
+          ...(isActive !== undefined && { isActive }),
+        },
+      });
+
+      let updatedInventory = existingProduct.inventory;
+
+      if (quantity !== undefined) {
+        updatedInventory = await tx.inventory.update({
+          where: {
+            productId,
+          },
+          data: {
+            quantity,
+          },
+        });
+      }
+
+      await tx.auditLog.create({
+        data: {
+          userId: req.user!.sub,
+          action: 'PRODUCT_UPDATED',
+          entityType: 'Product',
+          entityId: productId,
+          metadata: {
+            name,
+            description,
+            priceCents,
+            quantity,
+            isActive,
+          },
+        },
+      });
+
+      return {
+        ...updatedProduct,
+        inventory: updatedInventory,
+      };
+    });
+
+    return res.json(result);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: 'Failed to update product',
+    });
+  }
+});
+
+productRoutes.delete('/:id', auth, requireRole('ADMIN'), async (req, res) => {
+  try {
+    const productId = req.params.id;
+
+    if (typeof productId !== 'string') {
+      return res.status(400).json({
+        message: 'Invalid product id',
+      });
+    }
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: 'Product not found',
+      });
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedProduct = await tx.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          isActive: false,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: req.user!.sub,
+          action: 'PRODUCT_UPDATED',
+          entityType: 'Product',
+          entityId: productId,
+          metadata: {
+            isActive: false,
+            reason: 'Soft deleted product',
+          },
+        },
+      });
+
+      return updatedProduct;
+    });
+
+    return res.json(result);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: 'Failed to delete product',
+    });
+  }
+});

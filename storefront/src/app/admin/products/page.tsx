@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 type Product = {
@@ -53,12 +54,12 @@ export default function AdminProductsPage() {
             </p>
           </div>
 
-          <a
+          <Link
             href="/admin/products/new"
             className="rounded-xl bg-black px-5 py-3 text-sm font-medium text-white"
           >
             Add product
-          </a>
+          </Link>
         </div>
 
         {error && <p className="mt-6 text-red-600">{error}</p>}
@@ -72,6 +73,7 @@ export default function AdminProductsPage() {
                 <th className="p-4">Price</th>
                 <th className="p-4">Stock</th>
                 <th className="p-4">Status</th>
+                <th className="p-4">Actions</th>
               </tr>
             </thead>
 
@@ -85,8 +87,24 @@ export default function AdminProductsPage() {
                   <td className="p-4">
                     {product.isActive ? 'Active' : 'Inactive'}
                   </td>
+                  <td className="p-4">
+                    <Link
+                      href={`/admin/products/${product.id}/edit`}
+                      className="rounded-lg border px-3 py-1 text-sm hover:bg-gray-50"
+                    >
+                      Edit
+                    </Link>
+                  </td>
                 </tr>
               ))}
+
+              {products.length === 0 && (
+                <tr>
+                  <td className="p-4 text-gray-600" colSpan={6}>
+                    No products found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
