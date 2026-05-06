@@ -4,7 +4,7 @@ export function getAccessToken() {
         return null;
     }
 
-    return localStorage.getitem('accessToken');
+    return localStorage.getItem('accessToken');
 }
 
 export function getStoredUser() {
