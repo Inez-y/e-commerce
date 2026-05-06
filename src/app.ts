@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { authRoutes } from './auth/auth.routes';
+import { adminRoutes } from './admin/admin.routes';
 import { productRoutes } from './products/product.routes';
 import { orderRoutes } from './orders/order.routes';
 import { notificationRoutes } from './notifications/notification.routes';
@@ -38,6 +39,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/auth', authRoutes);
+app.use('/admin', adminRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/notifications', notificationRoutes);
