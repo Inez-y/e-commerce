@@ -125,6 +125,7 @@ export default function CartPage() {
               </div>
 
               <button
+                data-testid="checkout-button"
                 onClick={handleCheckout}
                 className="mt-6 w-full rounded-xl bg-black px-5 py-3 font-medium text-white"
               >

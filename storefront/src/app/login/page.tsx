@@ -46,8 +46,9 @@ export default function LoginPage() {
           className="mt-8 space-y-4"
         >
           <div>
-            <label className="text-sm font-medium">Email</label>
+            <label className="text-sm font-medium"> Email </label>
             <input
+              data-testid="email-input"
               className="mt-1 w-full rounded-lg border px-3 py-2"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -55,8 +56,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium">Password</label>
+            <label className="text-sm font-medium"> Password </label>
             <input
+              data-testid="password-input"
               className="mt-1 w-full rounded-lg border px-3 py-2"
               type="password"
               value={password}
@@ -66,7 +68,10 @@ export default function LoginPage() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <button className="w-full rounded-xl bg-black px-5 py-3 font-medium text-white">
+          <button 
+            data-testid="login-button"
+            className="w-full rounded-xl bg-black px-5 py-3 font-medium text-white"
+          >
             Login
           </button>
         </form>
