@@ -27,6 +27,10 @@ export function AdminNav() {
             Notifications
           </Link>
 
+          <Link href="/admin/audit-logs" className="hover:underline">
+            Audit Logs
+          </Link>
+
           <button
             onClick={() => {
               logout();
