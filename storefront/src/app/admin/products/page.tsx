@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { AdminNav } from '@/components/admin/admin-nav';
 
 type Product = {
   id: string;
@@ -44,6 +45,8 @@ export default function AdminProductsPage() {
   }, []);
 
   return (
+    <>
+    <AdminNav />
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between">
@@ -110,5 +113,6 @@ export default function AdminProductsPage() {
         </div>
       </div>
     </main>
+    </>
   );
 }

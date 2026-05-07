@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAccessToken } from '@/lib/auth';
+import { AdminNav } from '@/components/admin/admin-nav';
 
 type Product = {
   id: string;
@@ -127,6 +128,8 @@ export default function EditProductPage({
 
   if (error) {
     return (
+      <>
+      <AdminNav />
       <main className="min-h-screen p-8">
         <div className="mx-auto max-w-xl">
           <p className="text-red-600">{error}</p>
@@ -135,20 +138,26 @@ export default function EditProductPage({
           </Link>
         </div>
       </main>
+      </>
     );
   }
 
   if (!product) {
     return (
+      <>
+      <AdminNav />
       <main className="min-h-screen p-8">
         <div className="mx-auto max-w-xl">
           <p>Loading product...</p>
         </div>
       </main>
+      </>
     );
   }
 
   return (
+    <>
+    <AdminNav />
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-xl">
         <Link href="/admin/products" className="text-sm text-gray-600 underline">
@@ -222,5 +231,6 @@ export default function EditProductPage({
         </div>
       </div>
     </main>
+    </>
   );
 }

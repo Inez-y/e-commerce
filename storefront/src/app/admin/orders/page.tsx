@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAccessToken, getStoredUser } from '@/lib/auth';
+import { AdminNav } from '@/components/admin/admin-nav';
 
 type Order = {
   id: string;
@@ -59,6 +60,8 @@ export default function AdminOrdersPage() {
   }, [router]);
 
   return (
+    <>
+    <AdminNav />
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between">
@@ -113,5 +116,6 @@ export default function AdminOrdersPage() {
         </div>
       </div>
     </main>
+    </>
   );
 }

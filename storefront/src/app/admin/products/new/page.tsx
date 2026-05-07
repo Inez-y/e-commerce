@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAccessToken } from '@/lib/auth';
+import { AdminNav } from '@/components/admin/admin-nav';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -63,6 +64,8 @@ export default function NewProductPage() {
   }
 
   return (
+    <>
+    <AdminNav />
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-xl">
         <Link href="/admin/products" className="text-sm text-gray-600 underline">
@@ -130,5 +133,6 @@ export default function NewProductPage() {
         </div>
       </div>
     </main>
+    </>
   );
 }

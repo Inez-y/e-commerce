@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAccessToken, getStoredUser } from '@/lib/auth';
+import { AdminNav } from '@/components/admin/admin-nav';
 
 type Notification = {
   id: string;
@@ -52,6 +53,8 @@ export default function AdminNotificationsPage() {
   }, [router]);
 
   return (
+    <>
+    <AdminNav />
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between">
@@ -110,5 +113,6 @@ export default function AdminNotificationsPage() {
         </div>
       </div>
     </main>
+    </>
   );
 }
