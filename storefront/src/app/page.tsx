@@ -79,7 +79,7 @@ export default async function HomePage() {
                   View product
                 </Link>
             </div>
-          ))};
+          ))}
         </div>
         )}
       </div>
