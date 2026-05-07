@@ -26,3 +26,31 @@ adminRoutes.get('/products', auth, requireRole('ADMIN'), async(req,res) => {
         });
     }
 });
+
+adminRoutes.get('/audit-logs', auth, requireRole('ADMIN'), async (req, res) => {
+  try {
+    const auditLogs = await prisma.auditLog.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 100,
+    });
+
+    return res.json(auditLogs);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: 'Failed to fetch audit logs',
+    });
+  }
+});
