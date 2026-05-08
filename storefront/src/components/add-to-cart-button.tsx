@@ -19,6 +19,7 @@ export function AddToCartButton({
 
     return (
         <button
+            data-testid="add-to-cart-button"
             disabled={disabled}
             onClick={() =>
                 addItem({
