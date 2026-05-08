@@ -48,7 +48,9 @@ export default function LoginPage() {
           <div>
             <label className="text-sm font-medium"> Email </label>
             <input
-              data-testid="email-input"
+              id="customer-email"
+              name="email"
+              aria-label="Email"
               className="mt-1 w-full rounded-lg border px-3 py-2"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -58,7 +60,9 @@ export default function LoginPage() {
           <div>
             <label className="text-sm font-medium"> Password </label>
             <input
-              data-testid="password-input"
+              id="customer-password"
+              name="password"
+              aria-label="Password"
               className="mt-1 w-full rounded-lg border px-3 py-2"
               type="password"
               value={password}

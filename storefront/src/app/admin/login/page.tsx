@@ -54,8 +54,11 @@ export default function AdminLoginPage() {
           className="mt-8 space-y-4"
         >
           <div>
-            <label className="text-sm font-medium">Email</label>
+            <label htmlFor="admin-email" className="text-sm font-medium">Email</label>
             <input
+              id="admin-email"
+              name="email"
+              aria-label="Email"
               className="mt-1 w-full rounded-lg border px-3 py-2"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -63,8 +66,11 @@ export default function AdminLoginPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium">Password</label>
+            <label htmlFor="admin-password" className="text-sm font-medium">Password</label>
             <input
+              id="admin-password"
+              name="password"
+              aria-label="password"
               className="mt-1 w-full rounded-lg border px-3 py-2"
               type="password"
               value={password}

@@ -1,40 +1,44 @@
 import { expect, test } from '@playwright/test';
 
-test('Customer can browse, add to cart, login and checkout', async({ page }) => {
-    await page.goto('/');
+test.beforeEach(async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => localStorage.clear());
+});
 
-    await expect(page.getByRole('heading', { name: /storefront/i })).toBeVisible();
+test('customer can browse, add to cart, login, and checkout', async ({ page }) => {
+  await page.goto('/');
 
-    // View product
-    const firstViewProductLink = page.getByRole('link', { name: /view product/i, }).first();
+  await expect(page.getByRole('heading', { name: /storefront/i })).toBeVisible();
 
-    await expect(firstViewProductLink).toBeVisible();
-    await firstViewProductLink.click();
+  await page.getByRole('link', { name: /view product/i }).first().click();
 
-    // Add to cart
-    await expect(page.getByRole('button', { name: /add to cart/i })).toBeVisible();
+  const addToCartButton = page.getByTestId('add-to-cart-button');
 
-    await page.getByTestId('add-to-cart-button').click();
+  await expect(addToCartButton).toBeVisible();
+  await expect(addToCartButton).toBeEnabled();
+  await addToCartButton.click();
 
-    // View cart
-    await page.getByRole('link', { name: /view cart/i }).click();
+  await expect(page.getByRole('button', { name: /add to cart/i })).toBeVisible();
+  await page.getByRole('button', { name: /add to cart/i }).click();
 
-    await expect(page.getByRole('heading', { name: /cart/i })).toBeVisible();
+  await page.getByRole('link', { name: /view cart/i }).click();
 
-    // Checkout button
-    await page.getByTestId('checkout-button').click();
-    await expect(page).toHaveURL(/\/login/);
+  await expect(page.getByRole('heading', { name: /^cart$/i })).toBeVisible();
 
-    await page.getByTestId('email-input').fill('customer@test.com');
-    await page.getByTestId('password-input').fill('password123');
-    await page.getByTestId('login-button').click();
+  await page.getByRole('button', { name: /checkout/i }).click();
 
-    await expect(page).toHaveURL(/\/cart/);
+  await expect(page).toHaveURL(/\/login/);
 
-    await page.getByTestId('checkout-button').click();
+  await page.getByLabel('Email').fill('customer@test.com');
+  await page.getByLabel('Password').fill('password123');
 
-    // Order confirmation
-    await expect(page).toHaveURL(/\/orders\/.+/);
-    await expect(page.getByRole('heading', { name: /order confirmed/i })).toBeVisible();
-    await expect(page.getByText(/status:/i)).toBeVisible();
+  await page.getByRole('button', { name: /^login$/i }).click();
+
+  await expect(page).toHaveURL(/\/cart/);
+
+  await page.getByRole('button', { name: /checkout/i }).click();
+
+  await expect(page).toHaveURL(/\/orders\/.+/);
+  await expect(page.getByRole('heading', { name: /order confirmed/i })).toBeVisible();
+  await expect(page.getByText(/status:/i)).toBeVisible();
 });
