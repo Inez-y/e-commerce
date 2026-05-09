@@ -16,10 +16,14 @@ test('customer can browse, add to cart, login, and checkout', async ({ page }) =
 
   await expect(addToCartButton).toBeVisible();
   await expect(addToCartButton).toBeEnabled();
+
   await addToCartButton.click();
 
-  await expect(page.getByRole('button', { name: /add to cart/i })).toBeVisible();
-  await page.getByRole('button', { name: /add to cart/i }).click();
+  await expect(page).toHaveURL(/\/cart\/added/);
+
+  await expect(
+    page.getByText(/added to cart|item added successfully/i)
+  ).toBeVisible();
 
   await page.getByRole('link', { name: /view cart/i }).click();
 
@@ -39,6 +43,8 @@ test('customer can browse, add to cart, login, and checkout', async ({ page }) =
   await page.getByRole('button', { name: /checkout/i }).click();
 
   await expect(page).toHaveURL(/\/orders\/.+/);
-  await expect(page.getByRole('heading', { name: /order confirmed/i })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /order confirmed/i })
+  ).toBeVisible();
   await expect(page.getByText(/status:/i)).toBeVisible();
 });
