@@ -73,15 +73,15 @@ export default function AdminNotificationsPage() {
         {error && <p className="mt-6 text-red-600">{error}</p>}
 
         <div className="mt-8 overflow-hidden rounded-xl border">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-center text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="p-4">Type</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Recipient</th>
-                <th className="p-4">Subject</th>
-                <th className="p-4">Sent At</th>
-                <th className="p-4">Error</th>
+                <th className="p-4 text-gray-600">Type</th>
+                <th className="p-4 text-gray-600">Status</th>
+                <th className="p-4 text-gray-600">Recipient</th>
+                <th className="p-4 text-gray-600">Subject</th>
+                <th className="p-4 text-gray-600">Sent At</th>
+                <th className="p-4 text-gray-600">Error</th>
               </tr>
             </thead>
 

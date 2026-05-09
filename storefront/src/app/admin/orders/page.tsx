@@ -78,15 +78,15 @@ export default function AdminOrdersPage() {
         {error && <p className="mt-6 text-red-600">{error}</p>}
 
         <div className="mt-8 overflow-hidden rounded-xl border">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-center text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="p-4">Order ID</th>
-                <th className="p-4">Customer</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Items</th>
-                <th className="p-4">Total</th>
-                <th className="p-4">Created</th>
+                <th className="p-4 text-gray-600">Order ID</th>
+                <th className="p-4 text-gray-600">Customer</th>
+                <th className="p-4 text-gray-600">Status</th>
+                <th className="p-4 text-gray-600">Items</th>
+                <th className="p-4 text-gray-600">Total</th>
+                <th className="p-4 text-gray-600">Created</th>
               </tr>
             </thead>
 
