@@ -5,6 +5,20 @@ import { requireRole } from '../middleware/requireRole';
 
 export const productRoutes = Router();
 
+/**
+ * @openapi
+ * /products:
+ *   get:
+ *     summary: List active products
+ *     description: Public endpoint that returns active products for the storefront.
+ *     tags:
+ *       - Products
+ *     responses:
+ *       200:
+ *         description: List of active products
+ *       500:
+ *         description: Failed to fetch products
+ */
 productRoutes.get('/', async (req, res) => {
   const products = await prisma.product.findMany({
     where: {
@@ -24,13 +38,11 @@ productRoutes.get('/', async (req, res) => {
 /**
  * @openapi
  * /products/{id}:
- *   delete:
- *     summary: Soft delete a product
- *     description: Admin-only endpoint that marks a product as inactive instead of deleting it.
+ *   get:
+ *     summary: Get product by ID
+ *     description: Public endpoint that returns one active product by ID.
  *     tags:
  *       - Products
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -40,13 +52,11 @@ productRoutes.get('/', async (req, res) => {
  *         description: Product ID
  *     responses:
  *       200:
- *         description: Product soft-deleted
- *       401:
- *         description: Missing or invalid token
- *       403:
- *         description: Admin access required
+ *         description: Product details
  *       404:
  *         description: Product not found
+ *       500:
+ *         description: Failed to fetch product
  */
 productRoutes.get('/:id', async (req, res) => {
   const product = await prisma.product.findFirst({
@@ -70,30 +80,54 @@ productRoutes.get('/:id', async (req, res) => {
 
 /**
  * @openapi
- * /products/{id}:
- *   delete:
- *     summary: Soft delete a product
- *     description: Admin-only endpoint that marks a product as inactive instead of deleting it.
+ * /products:
+ *   post:
+ *     summary: Create a product
+ *     description: Admin-only endpoint for creating a product and initial inventory.
  *     tags:
  *       - Products
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - sku
+ *               - priceCents
+ *               - quantity
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Desk Lamp
+ *               description:
+ *                 type: string
+ *                 example: Adjustable LED desk lamp
+ *               sku:
+ *                 type: string
+ *                 example: LAMP-001
+ *               priceCents:
+ *                 type: integer
+ *                 example: 3499
+ *               quantity:
+ *                 type: integer
+ *                 example: 15
  *     responses:
- *       200:
- *         description: Product soft-deleted
+ *       201:
+ *         description: Product created successfully
+ *       400:
+ *         description: Missing or invalid product fields
  *       401:
  *         description: Missing or invalid token
  *       403:
  *         description: Admin access required
- *       404:
- *         description: Product not found
+ *       409:
+ *         description: Product SKU already exists
+ *       500:
+ *         description: Failed to create product
  */
 productRoutes.post('/', auth, requireRole('ADMIN'), async (req, res) => {
   try {
@@ -167,6 +201,59 @@ productRoutes.post('/', auth, requireRole('ADMIN'), async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /products/{id}:
+ *   patch:
+ *     summary: Update a product
+ *     description: Admin-only endpoint for updating product details, inventory quantity, and active status.
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Desk Lamp
+ *               description:
+ *                 type: string
+ *                 example: Adjustable LED desk lamp with USB charging
+ *               priceCents:
+ *                 type: integer
+ *                 example: 3999
+ *               quantity:
+ *                 type: integer
+ *                 example: 20
+ *               isActive:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Product updated successfully
+ *       400:
+ *         description: Invalid product ID or invalid input
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Failed to update product
+ */
 productRoutes.patch('/:id', auth, requireRole('ADMIN'), async (req, res) => {
   try {
     const productId = req.params.id;
@@ -252,6 +339,127 @@ productRoutes.patch('/:id', auth, requireRole('ADMIN'), async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /products/{id}/restore:
+ *   patch:
+ *     summary: Restore an inactive product
+ *     description: Admin-only endpoint that changes a product from inactive back to active.
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Product restored successfully
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Failed to restore product
+ */
+productRoutes.patch('/:id/restore', auth, requireRole('ADMIN'), async (req, res) => {
+    try {
+      const productId = req.params.id;
+
+      if (typeof productId !== 'string') {
+        return res.status(400).json({
+          message: 'Invalid product id',
+        });
+    }
+      const product = await prisma.product.findUnique({
+        where: {
+          id: productId,
+        },
+      });
+
+      if (!product) {
+        return res.status(404).json({
+          message: 'Product not found',
+        });
+      }
+
+      const restoredProduct = await prisma.$transaction(async (tx) => {
+        const updatedProduct = await tx.product.update({
+          where: {
+            id: productId,
+          },
+          data: {
+            isActive: true,
+          },
+          include: {
+            inventory: true,
+          },
+        });
+
+        await tx.auditLog.create({
+          data: {
+            userId: req.user!.sub,
+            action: 'PRODUCT_UPDATED',
+            entityType: 'Product',
+            entityId: productId,
+            metadata: {
+              isActive: true,
+              reason: 'Restored soft-deleted product',
+            },
+          },
+        });
+
+        return updatedProduct;
+      });
+
+      return res.json(restoredProduct);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: 'Failed to restore product',
+      });
+    }
+  }
+);
+
+/**
+ * @openapi
+ * /products/{id}:
+ *   delete:
+ *     summary: Deactivate a product
+ *     description: Admin-only endpoint that marks a product as inactive instead of permanently deleting it.
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Product deactivated successfully
+ *       400:
+ *         description: Invalid product ID
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Failed to deactivate product
+ */
 productRoutes.delete('/:id', auth, requireRole('ADMIN'), async (req, res) => {
   try {
     const productId = req.params.id;

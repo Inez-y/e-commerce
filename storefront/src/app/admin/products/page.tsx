@@ -30,37 +30,69 @@ export default function AdminProductsPage() {
   const [error, setError] = useState('');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  useEffect(() => {
-    async function fetchProducts() {
-      const token = getAccessToken();
-      const user = getStoredUser();
+  async function fetchProducts() {
+    const token = getAccessToken();
+    const user = getStoredUser();
 
-      if (!token || user?.role !== 'ADMIN') {
-        router.replace('/admin/login');
-        return;
-      }
+    if (!token || user?.role !== 'ADMIN') {
+      router.replace('/admin/login');
+      return;
+    }
 
-      setIsCheckingAuth(false);
+    setIsCheckingAuth(false);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.message ?? 'Failed to fetch products');
+      return;
+    }
+
+    setProducts(data);
+  }
+
+  async function handleRestoreProduct(productId: string) {
+    const token = getAccessToken();
+
+    if (!token) {
+      setError('Please log in as admin.');
+      return;
+    }
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}/restore`,
+      {
+        method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message ?? 'Failed to fetch products');
-        return;
       }
+    );
 
-      setProducts(data);
+    const contentType = res.headers.get('content-type');
+
+    const data = contentType?.includes('application/json')
+      ? await res.json()
+      : { message: await res.text() };
+
+    if (!res.ok) {
+      setError(data.message ?? 'Failed to restore product');
+      return;
     }
 
-    fetchProducts();
-  }, [router]);
+    await fetchProducts();
+  }
 
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+  
   if (isCheckingAuth) {
     return (
       <>
@@ -71,7 +103,6 @@ export default function AdminProductsPage() {
       </>
     );
   }
-
 
   return (
     <>
@@ -88,7 +119,7 @@ export default function AdminProductsPage() {
 
           <Link
             href="/admin/products/new"
-            className="rounded-xl bg-black px-5 py-3 text-sm font-medium text-white"
+            className="rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white"
           >
             Add product
           </Link>
@@ -111,21 +142,42 @@ export default function AdminProductsPage() {
 
             <tbody>
               {products.map((product) => (
-                <tr key={product.id} className="border-t">
+                <tr key={product.id} className={`border-t ${product.isActive ? '' : ' text-gray-500'}`}>
                   <td className="p-4 font-medium">{product.name}</td>
                   <td className="p-4">{product.sku}</td>
                   <td className="p-4">{formatPrice(product.priceCents)}</td>
                   <td className="p-4">{product.inventory?.quantity ?? 0}</td>
                   <td className="p-4">
-                    {product.isActive ? 'Active' : 'Inactive'}
+                    {product.isActive ? (
+                      <span className="rounded-full px-3 py-1 text-xs font-medium text-green-700">
+                        Active
+                      </span>
+                    ) : (
+                      <span className="rounded-full px-3 py-1 text-xs font-medium text-red-700">
+                        Inactive
+                      </span>
+                    )}
                   </td>
                   <td className="p-4">
-                    <Link
-                      href={`/admin/products/${product.id}/edit`}
-                      className="rounded-lg border px-3 py-1 text-sm hover:bg-gray-50"
-                    >
-                      Edit
-                    </Link>
+                    <div className="flex justify-center gap-2">
+                      {product.isActive && (
+                        <Link
+                          href={`/admin/products/${product.id}/edit`}
+                          className="rounded-lg border px-3 py-1 text-sm hover:bg-gray-50"
+                        >
+                          Edit
+                        </Link>
+                      )}
+
+                      {!product.isActive && (
+                        <button
+                          onClick={() => handleRestoreProduct(product.id)}
+                          className="rounded-lg border border-green-600 px-3 py-1 text-sm text-green-900 hover:bg-green-50"
+                        >
+                          Restore
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
