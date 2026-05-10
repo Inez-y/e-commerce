@@ -75,7 +75,7 @@ export default async function ProductDetailPage({
             </p>
           </div>
 
-          <p className="mt-6 text-gray-700">
+          <p className="mt-6 text-gray-500">
             {product.description ?? 'No description available.'}
           </p>
 
