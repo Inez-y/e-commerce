@@ -21,6 +21,33 @@ productRoutes.get('/', async (req, res) => {
   return res.json(products);
 });
 
+/**
+ * @openapi
+ * /products/{id}:
+ *   delete:
+ *     summary: Soft delete a product
+ *     description: Admin-only endpoint that marks a product as inactive instead of deleting it.
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Product soft-deleted
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Product not found
+ */
 productRoutes.get('/:id', async (req, res) => {
   const product = await prisma.product.findFirst({
     where: {
@@ -41,6 +68,33 @@ productRoutes.get('/:id', async (req, res) => {
   return res.json(product);
 });
 
+/**
+ * @openapi
+ * /products/{id}:
+ *   delete:
+ *     summary: Soft delete a product
+ *     description: Admin-only endpoint that marks a product as inactive instead of deleting it.
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Product soft-deleted
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Product not found
+ */
 productRoutes.post('/', auth, requireRole('ADMIN'), async (req, res) => {
   try {
     const { name, description, sku, priceCents, quantity } = req.body;
