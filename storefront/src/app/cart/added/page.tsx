@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 type CartAddedPageProps = {
   searchParams: Promise<{
@@ -12,6 +13,8 @@ export default async function CartAddedPage({
   const { productName } = await searchParams;
 
   return (
+    <>
+    <StorefrontNav />
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-xl">
         <section className="rounded-2xl border p-8 text-center shadow-sm">
@@ -43,5 +46,6 @@ export default async function CartAddedPage({
         </section>
       </div>
     </main>
+    </>
   );
 }

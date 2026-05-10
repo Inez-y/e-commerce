@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AddToCartButton } from '@/components/add-to-cart-button';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 type Product = {
   id: string;
@@ -51,6 +52,9 @@ export default async function ProductDetailPage({
   const isOutOfStock = stock <= 0;
 
   return (
+    <>
+    <StorefrontNav />
+
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
@@ -95,5 +99,6 @@ export default async function ProductDetailPage({
         </section>
       </div>
     </main>
+    </>
   );
 }

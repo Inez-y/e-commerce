@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 type Product = {
   id: string;
@@ -48,6 +49,9 @@ export default async function HomePage() {
   const products = await getProducts();
 
   return (
+    <>
+    <StorefrontNav />
+    
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-5xl">
         <h1 className="text-3xl font-bold"> Storefront </h1>
@@ -82,5 +86,6 @@ export default async function HomePage() {
         )}
       </div>
     </main>
+    </>
   );
 }

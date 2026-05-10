@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/context/cart-context';
 import { useRouter } from 'next/navigation';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 function formatPrice(priceCents: number) {
   return `$${(priceCents / 100).toFixed(2)}`;
@@ -59,6 +60,9 @@ export default function CartPage() {
   }
 
   return (
+    <>
+    <StorefrontNav />
+
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-3xl">
         <Link href="/" className="text-sm text-gray-600 hover:underline">
@@ -68,7 +72,7 @@ export default function CartPage() {
         <h1 className="mt-8 text-3xl font-bold">Cart</h1>
 
         {items.length === 0 ? (
-          <p className="mt-8 text-gray-600">Your cart is empty.</p>
+          <p className="mt-8 text-gray-300">Your cart is empty.</p>
         ) : (
           <div className="mt-8 space-y-4">
             {items.map((item) => (
@@ -167,5 +171,6 @@ export default function CartPage() {
         </div>
       )}
     </main>
+    </>
   );
 }

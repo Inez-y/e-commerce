@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 type order = {
     id: string;
@@ -69,6 +70,9 @@ export default function OrderConfirmationPage({
         console.log('[Orders] Error occured.');
 
         return(
+            <>
+            <StorefrontNav />
+
             <main className="min-h-screen p-8">
                 <div className="mx-auto max-w-3xl">
                 <p className="text-red-600">{error}</p>
@@ -77,6 +81,7 @@ export default function OrderConfirmationPage({
                 </Link>
                 </div>
             </main>
+            </>
         );
     }
 
@@ -84,16 +89,23 @@ export default function OrderConfirmationPage({
         console.log('[Orders] Loading order...');
 
         return (
+            <>
+            <StorefrontNav />
+
             <main className="min-h-screen p-8">
                 <div className="mx-auto max-w-3xl">
                 <p>Loading order...</p>
                 </div>
             </main>
+            </>
         );
     }
 
     console.log('[Orders] Order confirmed.')
     return (
+        <>
+        <StorefrontNav />
+
         <main className="min-h-screen p-8">
             <div className="mx-auto max-w-3xl">
                 <h1 className="text-3xl font-bold"> Order confirmed </h1>
@@ -130,5 +142,6 @@ export default function OrderConfirmationPage({
                 </Link>
             </div>
         </main>
+        </>
     );
 }
