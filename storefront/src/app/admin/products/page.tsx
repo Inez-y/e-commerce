@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getAccessToken, getStoredUser } from '@/lib/auth';
 import { AdminNav } from '@/components/admin/admin-nav';
 
 type Product = {
@@ -22,27 +24,54 @@ function formatPrice(priceCents: number) {
 }
 
 export default function AdminProductsPage() {
+  const router = useRouter();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState('');
-
-  async function fetchProducts() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
-      cache: 'no-store',
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message ?? 'Failed to fetch products');
-      return;
-    }
-
-    setProducts(data);
-  }
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
+    async function fetchProducts() {
+      const token = getAccessToken();
+      const user = getStoredUser();
+
+      if (!token || user?.role !== 'ADMIN') {
+        router.replace('/admin/login');
+        return;
+      }
+
+      setIsCheckingAuth(false);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message ?? 'Failed to fetch products');
+        return;
+      }
+
+      setProducts(data);
+    }
+
     fetchProducts();
-  }, []);
+  }, [router]);
+
+  if (isCheckingAuth) {
+    return (
+      <>
+      <AdminNav />
+      <main className="min-h-screen p-8">
+        <p> Checking admin access... </p>
+      </main>
+      </>
+    );
+  }
+
 
   return (
     <>
