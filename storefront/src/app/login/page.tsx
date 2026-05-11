@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,6 +12,9 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   return (
+    <>
+    <StorefrontNav />
+
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-md">
         <h1 className="text-3xl font-bold">Login</h1>
@@ -81,5 +85,6 @@ export default function LoginPage() {
         </form>
       </div>
     </main>
+    </>
   );
 }

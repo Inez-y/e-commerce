@@ -6,8 +6,45 @@ import { createNotification } from '../notifications/notification.service';
 export const orderRoutes = Router();
 
 /**
- * POST /orders
- * Customer creates an order
+ * @openapi
+ * /orders:
+ *   post:
+ *     summary: Create an order
+ *     description: Customer creates an order from cart items. Inventory is decremented transactionally.
+ *     tags:
+ *       - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - items
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - productId
+ *                     - quantity
+ *                   properties:
+ *                     productId:
+ *                       type: string
+ *                       example: e4b05094-20a1-49c4-81d8-d0e4e4fa993d
+ *                     quantity:
+ *                       type: integer
+ *                       example: 2
+ *     responses:
+ *       201:
+ *         description: Order created
+ *       400:
+ *         description: Invalid order or insufficient inventory
+ *       401:
+ *         description: Missing or invalid token
  */
 orderRoutes.post('/', auth, async(req, res)=> {
     try {
@@ -148,8 +185,20 @@ orderRoutes.post('/', auth, async(req, res)=> {
 });
 
 /**
- * GET /orders
- * Admin sees all orders, customer sees own orders
+ * @openapi
+ * /orders:
+ *   get:
+ *     summary: List orders
+ *     description: Admins see all orders. Customers see only their own orders.
+ *     tags:
+ *       - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of orders
+ *       401:
+ *         description: Missing or invalid token
  */
 orderRoutes.get('/', auth, async(req, res)=> {
     try {
@@ -188,8 +237,29 @@ orderRoutes.get('/', auth, async(req, res)=> {
 });
 
 /**
- * GET /orders/:id
- * Admin can see any order, customer only their own order
+ * @openapi
+ * /orders/{id}:
+ *   get:
+ *     summary: Get order by ID
+ *     description: Admins can view any order. Customers can view only their own order.
+ *     tags:
+ *       - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Order ID
+ *     responses:
+ *       200:
+ *         description: Order details
+ *       401:
+ *         description: Missing or invalid token
+ *       404:
+ *         description: Order not found
  */
 orderRoutes.get('/:id', auth, async (req, res) => {
   try {

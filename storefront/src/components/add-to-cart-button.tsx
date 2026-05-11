@@ -40,7 +40,7 @@ export function AddToCartButton({
       data-testid="add-to-cart-button"
       disabled={disabled}
       onClick={handleAddToCart}
-      className="mt-8 w-full rounded-xl bg-black px-5 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+      className="mt-8 w-full rounded-xl bg-gray-800 px-5 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
     >
       {disabled ? 'Out of stock' : 'Add to cart'}
     </button>

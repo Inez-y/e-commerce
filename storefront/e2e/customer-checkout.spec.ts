@@ -31,6 +31,12 @@ test('customer can browse, add to cart, login, and checkout', async ({ page }) =
 
   await page.getByRole('button', { name: /checkout/i }).click();
 
+  await expect(
+    page.getByRole('heading', { name: /login required/i })
+  ).toBeVisible();
+
+  await page.getByRole('button', { name: /continue to login/i }).click();
+
   await expect(page).toHaveURL(/\/login/);
 
   await page.getByLabel('Email').fill('customer@test.com');

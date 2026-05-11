@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 type order = {
     id: string;
@@ -11,7 +12,7 @@ type order = {
         id: string;
         quantity: number;
         unitPriceCents: number;
-        subTotalCents: number;
+        subtotalCents: number;
         product: {
             id: string;
             name: string;
@@ -69,6 +70,9 @@ export default function OrderConfirmationPage({
         console.log('[Orders] Error occured.');
 
         return(
+            <>
+            <StorefrontNav />
+
             <main className="min-h-screen p-8">
                 <div className="mx-auto max-w-3xl">
                 <p className="text-red-600">{error}</p>
@@ -77,6 +81,7 @@ export default function OrderConfirmationPage({
                 </Link>
                 </div>
             </main>
+            </>
         );
     }
 
@@ -84,16 +89,23 @@ export default function OrderConfirmationPage({
         console.log('[Orders] Loading order...');
 
         return (
+            <>
+            <StorefrontNav />
+
             <main className="min-h-screen p-8">
                 <div className="mx-auto max-w-3xl">
                 <p>Loading order...</p>
                 </div>
             </main>
+            </>
         );
     }
 
     console.log('[Orders] Order confirmed.')
     return (
+        <>
+        <StorefrontNav />
+
         <main className="min-h-screen p-8">
             <div className="mx-auto max-w-3xl">
                 <h1 className="text-3xl font-bold"> Order confirmed </h1>
@@ -105,12 +117,11 @@ export default function OrderConfirmationPage({
                 <div className="mt-8 space-y-4">
                     {order.items.map((item) => (
                         <div key={item.id} className="rounded-xl border p-5">
-                        <h2 className="font-semibold">{ item.product.name} </h2>
-                        <p className="text-sm text-gray-600">S KU: {item.product.sku} </p>
-                        <p className="mt-2 text-sm">
-                            Quantity: {item.quantity} × {formatPrice(item.unitPriceCents)}
-                        </p>
-                        <p className="font-medium"> {formatPrice(item.subtotalCents)} </p>
+                        <h2 className="font-semibold"> { item.product.name} </h2>
+                        <p className="text-sm text-gray-600"> SKU: { item.product.sku } </p>
+                        <p className="mt-2 text-sm"> Price: { formatPrice(item.unitPriceCents) } </p>
+                        <p className="text-sm"> Quantity:  { item.quantity } </p>
+                        <p className="font-medium"> Item total: { formatPrice(item.subtotalCents) } </p>
                         </div>
                     ))}
                 </div>
@@ -125,11 +136,12 @@ export default function OrderConfirmationPage({
 
                 <Link
                     href="/"
-                    className="mt-8 inline-block rounded-xl bg-black px-5 py-3 text-white"
+                    className="mt-8 inline-block rounded-xl bg-gray-800 px-5 py-3 text-white"
                     >
                     Continue shopping
                 </Link>
             </div>
         </main>
+        </>
     );
 }
