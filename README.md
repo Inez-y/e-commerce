@@ -2,6 +2,10 @@
 
 Full-stack e-commerce platform with a backend API, customer storefront, admin dashboard, background notification worker, PostgreSQL database, Redis queue, Docker Compose, Swagger docs, and integration tests.
 
+## Demo Video
+[![E-commerce Demo Video](image.png)](https://www.youtube.com/watch?v=u0hziNZr2fE)
+Click the image to watch the demo on youtube.
+
 ## Tech Stack
 
 - Backend: Node.js, Express, TypeScript, Prisma
@@ -58,7 +62,147 @@ Products     Queue     Notifications
 Orders
 Inventory
 Audit Logs
-````
+```
+
+## Database Design
+
+The application uses PostgreSQL with Prisma ORM. The schema is designed around product catalog management, inventory tracking, order processing, background notifications, and audit logging.
+
+### Main Tables
+
+| Table | Purpose |
+|---|---|
+| `User` | Stores customer/admin accounts and role information. |
+| `Product` | Stores product catalog data such as name, SKU, price, and active status. |
+| `Inventory` | Tracks stock quantity and reserved quantity for each product. |
+| `Order` | Stores customer orders and order status. |
+| `OrderItem` | Stores individual products within an order, including quantity and price at purchase time. |
+| `Notification` | Stores notification jobs and delivery status. |
+| `AuditLog` | Records important system/admin actions for observability. |
+
+### Entity Relationships
+
+```txt
+User
+ ├── Order[]
+ └── AuditLog[]
+
+Product
+ ├── Inventory 1:1
+ └── OrderItem[]
+
+Order
+ ├── User many:1
+ └── OrderItem[]
+
+Notification
+ └── Standalone job record
+
+AuditLog
+ └── Optional User reference
+```
+
+### ERD
+```
+┌─────────────┐
+│    User     │
+├─────────────┤
+│ id          │
+│ email       │
+│ passwordHash│
+│ role        │
+│ createdAt   │
+│ updatedAt   │
+└──────┬──────┘
+       │ 1
+       │
+       │ *
+┌──────▼──────┐
+│    Order    │
+├─────────────┤
+│ id          │
+│ userId      │
+│ status      │
+│ totalCents  │
+│ createdAt   │
+│ updatedAt   │
+└──────┬──────┘
+       │ 1
+       │
+       │ *
+┌──────▼──────┐        ┌─────────────┐
+│  OrderItem  │ *    1 │   Product   │
+├─────────────┤────────►─────────────┤
+│ id          │        │ id          │
+│ orderId     │        │ name        │
+│ productId   │        │ description │
+│ quantity    │        │ priceCents  │
+│ unitPrice   │        │ sku         │
+│ subtotal    │        │ isActive    │
+└─────────────┘        │ createdAt   │
+                       │ updatedAt   │
+                       └──────┬──────┘
+                              │ 1
+                              │
+                              │ 1
+                       ┌──────▼──────┐
+                       │  Inventory  │
+                       ├─────────────┤
+                       │ id          │
+                       │ productId   │
+                       │ quantity    │
+                       │ reserved    │
+                       │ createdAt   │
+                       │ updatedAt   │
+                       └─────────────┘
+
+
+┌─────────────┐
+│ Notification│
+├─────────────┤
+│ id          │
+│ type        │
+│ status      │
+│ recipient   │
+│ subject     │
+│ body        │
+│ errorMessage│
+│ sentAt      │
+│ createdAt   │
+│ updatedAt   │
+└─────────────┘
+
+
+┌─────────────┐        ┌─────────────┐
+│  AuditLog   │ *    1 │    User     │
+├─────────────┤────────►─────────────┤
+│ id          │        │ id          │
+│ userId      │        │ email       │
+│ action      │        │ role        │
+│ entityType  │        └─────────────┘
+│ entityId    │
+│ metadata    │
+│ createdAt   │
+└─────────────┘
+```
+
+### Important Design Decisions
+- `Product.isActive` is used for deactivation instead of hard deletion, allowing admins to restore inactive products.
+- `OrderItem.unitPriceCents` stores the product price at the time of purchase so historical orders remain accurate even if product prices change later.
+- `OrderItem.subtotalCents` stores the calculated item total for easier reporting and order display.
+- `Inventory` is separated from Product so stock management can evolve independently from catalog data.
+- `AuditLog.metadata` uses JSON to store flexible action details without requiring a new table for each event type.
+- `Notification.status` tracks background job processing states such as PENDING, SENT, and FAILED.
+
+### Enums
+| Enum                 | Values                                                                                                           |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `Role`               | `ADMIN`, `CUSTOMER`                                                                                              |
+| `OrderStatus`        | `PENDING`, `PAID`, `CANCELLED`, `FULFILLED`                                                                      |
+| `NotificationStatus` | `PENDING`, `SENT`, `FAILED`                                                                                      |
+| `NotificationType`   | `ORDER_CREATED`, `ORDER_CANCELLED`, `LOW_STOCK`                                                                  |
+| `AuditAction`        | `USER_REGISTERED`, `PRODUCT_CREATED`, `PRODUCT_UPDATED`, `ORDER_CREATED`, `ORDER_CANCELLED`, `INVENTORY_UPDATED` |
+
 
 ## Running Locally
 
@@ -167,6 +311,4 @@ GET    /admin/audit-logs
 * Search and filtering
 * Email provider integration
 * OpenTelemetry tracing
-* Playwright E2E tests
 * Deployment to cloud
-

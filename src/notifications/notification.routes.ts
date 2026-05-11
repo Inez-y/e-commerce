@@ -9,8 +9,22 @@ import { requireRole } from '../middleware/requireRole';
 export const notificationRoutes = Router();
 
 /**
- * GET /notifications
- * Admin can inspect all notifications
+ * @openapi
+ * /notifications:
+ *   get:
+ *     summary: List notifications
+ *     description: Admin-only endpoint for viewing notification job records.
+ *     tags:
+ *       - Notifications
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of notifications
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
  */
 notificationRoutes.get('/', auth, requireRole('ADMIN'), async(req, res) => {
     try {
@@ -32,8 +46,31 @@ notificationRoutes.get('/', auth, requireRole('ADMIN'), async(req, res) => {
 });
 
 /**
- * GET /notifications/:id
- * Admin can inspect one notification
+ * @openapi
+ * /notifications/{id}:
+ *   get:
+ *     summary: Get notification by ID
+ *     description: Admin-only endpoint for viewing one notification record.
+ *     tags:
+ *       - Notifications
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Notification ID
+ *     responses:
+ *       200:
+ *         description: Notification details
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Notification not found
  */
 notificationRoutes.get('/:id', auth, requireRole('ADMIN'), async(req, res) => {
     try {

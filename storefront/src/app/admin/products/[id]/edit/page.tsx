@@ -217,7 +217,7 @@ export default function EditProductPage({
 
           <button
             onClick={handleUpdateProduct}
-            className="w-full rounded-xl bg-black px-5 py-3 font-medium text-white"
+            className="w-full rounded-xl bg-gray-900 px-5 py-3 font-medium text-white"
           >
             Save Changes
           </button>

@@ -5,6 +5,24 @@ import { requireRole } from '../middleware/requireRole';
 
 export const adminRoutes = Router();
 
+/**
+ * @openapi
+ * /admin/products:
+ *   get:
+ *     summary: List all products for admin
+ *     description: Returns all products, including inactive or soft-deleted products.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Admin product list
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ */
 adminRoutes.get('/products', auth, requireRole('ADMIN'), async(req,res) => {
     try {
         const products = await prisma.product.findMany({
@@ -27,6 +45,24 @@ adminRoutes.get('/products', auth, requireRole('ADMIN'), async(req,res) => {
     }
 });
 
+/**
+ * @openapi
+ * /admin/audit-logs:
+ *   get:
+ *     summary: List audit logs
+ *     description: Returns recent audit logs for admin visibility.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of audit logs
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Admin access required
+ */
 adminRoutes.get('/audit-logs', auth, requireRole('ADMIN'), async (req, res) => {
   try {
     const auditLogs = await prisma.auditLog.findMany({

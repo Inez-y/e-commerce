@@ -96,14 +96,14 @@ export default function AdminAuditLogsPage() {
 
           {!isLoading && !error && (
             <div className="mt-8 overflow-hidden rounded-xl border">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-center text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="p-4">Action</th>
-                    <th className="p-4">Entity</th>
-                    <th className="p-4">User</th>
-                    <th className="p-4">Created</th>
-                    <th className="p-4">Metadata</th>
+                    <th className="p-4 text-gray-600">Action</th>
+                    <th className="p-4 text-gray-600">Entity</th>
+                    <th className="p-4 text-gray-600">User</th>
+                    <th className="p-4 text-gray-600">Created</th>
+                    <th className="p-4 text-gray-600">Metadata</th>
                   </tr>
                 </thead>
 

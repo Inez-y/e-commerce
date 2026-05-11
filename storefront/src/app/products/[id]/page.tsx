@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AddToCartButton } from '@/components/add-to-cart-button';
+import { StorefrontNav } from '@/components/storefront-nav';
 
 type Product = {
   id: string;
@@ -51,6 +52,9 @@ export default async function ProductDetailPage({
   const isOutOfStock = stock <= 0;
 
   return (
+    <>
+    <StorefrontNav />
+
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
@@ -66,8 +70,8 @@ export default async function ProductDetailPage({
         <section className="mt-8 rounded-2xl border p-8 shadow-sm">
           <div className="flex items-start justify-between gap-6">
             <div>
-              <p className="text-sm text-gray-500">SKU: {product.sku}</p>
-              <h1 className="mt-2 text-3xl font-bold">{product.name}</h1>
+              <p className="text-sm text-gray-500">SKU: {product.sku} </p>
+              <h1 className="mt-2 text-3xl font-bold"> {product.name} </h1>
             </div>
 
             <p className="text-2xl font-semibold">
@@ -75,13 +79,13 @@ export default async function ProductDetailPage({
             </p>
           </div>
 
-          <p className="mt-6 text-gray-700">
+          <p className="mt-6 text-gray-500">
             {product.description ?? 'No description available.'}
           </p>
 
           <div className="mt-6 rounded-xl bg-gray-50 p-4">
-            <p className="text-sm text-gray-600">Available stock</p>
-            <p className="text-xl font-semibold">{stock}</p>
+            <p className="text-sm text-gray-600"> Available stock </p>
+            <p className="text-xl text-gray-600 font-semibold"> {stock} </p>
           </div>
 
           <AddToCartButton
@@ -95,5 +99,6 @@ export default async function ProductDetailPage({
         </section>
       </div>
     </main>
+    </>
   );
 }

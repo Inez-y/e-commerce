@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -26,10 +27,51 @@ type CartContextValue = {
   itemCount: number;
 };
 
+const CART_STORAGE_KEY = 'cartItems';
+
 const CartContext = createContext<CartContextValue | null>(null);
+
+function readCartFromStorage(): CartItem[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+
+  if (!storedCart) {
+    return [];
+  }
+
+  try {
+    const parsedCart = JSON.parse(storedCart);
+
+    if (!Array.isArray(parsedCart)) {
+      return [];
+    }
+
+    return parsedCart;
+  } catch {
+    return [];
+  }
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hasLoadedCart, setHasLoadedCart] = useState(false);
+
+  useEffect(() => {
+    const storedItems = readCartFromStorage();
+    setItems(storedItems);
+    setHasLoadedCart(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedCart) {
+      return;
+    }
+
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items, hasLoadedCart]);
 
   function addItem(item: Omit<CartItem, 'quantity'>) {
     setItems((currentItems) => {
@@ -79,6 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   function clearCart() {
     setItems([]);
+    localStorage.removeItem(CART_STORAGE_KEY);
   }
 
   const totalCents = useMemo(() => {
